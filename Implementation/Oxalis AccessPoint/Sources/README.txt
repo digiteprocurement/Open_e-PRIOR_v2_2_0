@@ -1,0 +1,2 @@
+For the source code of the Oxalis AccessPoint customization, please refer to the following repository managed by the DIGIT CEF e-Delivery team: https://webgate.ec.europa.eu/CITnet/svn/EDELIVERY/trunk/oxalis
+The source code of the forked Oxalis implementation is accessible on demand by sending an email to: DIGIT-CEF-EDELIVERY-TO@ec.europa.eu

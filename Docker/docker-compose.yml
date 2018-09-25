@@ -1,0 +1,29 @@
+mysql-peppol-viewer:
+  environment:
+    MYSQL_ROOT_PASSWORD: peppol
+  image: digiteprocurement/mysql-peppol-viewer
+  ports:
+    - "3306:3306"
+  volumes:
+    - $MYSQL_DATA_VOLUME_PATH:/var/lib/mysql
+wildfly-peppol-viewer:
+  links:
+    - mysql-peppol-viewer
+  ports:
+    - "8080:8080"
+    - "9990:9990"
+  command: ["./wait-for-it.sh", "mysql-peppol-viewer:3306", "--", "/opt/jboss/wildfly/bin/standalone.sh", "-c", "standalone-custom.xml", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+  image: digiteprocurement/wildfly-peppol-viewer
+  volumes:
+    - $WILDFLY_PATH:/opt/jboss/wildfly/standalone/data
+tomcat-peppol-viewer:
+  environment:
+     OXALIS_HOME: /usr/local/tomcat/.oxalis/
+  links:
+    - mysql-peppol-viewer
+  ports:
+    - "8081:8080"
+    - "443:443"
+  image: digiteprocurement/tomcat-peppol-viewer
+  volumes:
+    - $OXALIS_KEYSTORE_PATH:/usr/local/tomcat/.oxalis/keystore

@@ -1,0 +1,66 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<display-name>Peppol Adapter Web Application</display-name>
+	<context-param>
+		<param-name>contextClass</param-name>
+		<param-value>
+			org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+		</param-value>
+	</context-param>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>eu.europa.ec.cipa.adapter.config.SpringConfiguration</param-value>
+	</context-param>
+	<filter>
+		<filter-name>AuthenticationFilter</filter-name>
+		<display-name>AuthenticationFilter</display-name>
+		<description></description>
+		<filter-class>eu.europa.ec.cipa.adapter.gui.AuthenticationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthenticationFilter</filter-name>
+		<url-pattern>/app/*</url-pattern>
+	</filter-mapping>	
+	
+	 <listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<servlet>
+		<servlet-name>VaadinServletMain</servlet-name>
+		<servlet-class>
+			com.vaadin.server.VaadinServlet
+		</servlet-class>
+		<init-param>
+			<param-name>UI</param-name>
+			<param-value>eu.europa.ec.cipa.adapter.gui.AdminUI</param-value>
+		</init-param>
+	</servlet>
+	<servlet>
+		<servlet-name>VaadinServletLogin</servlet-name>
+		<servlet-class>
+			com.vaadin.server.VaadinServlet
+		</servlet-class>
+		<init-param>
+			<param-name>UI</param-name>
+			<param-value>eu.europa.ec.cipa.adapter.gui.LoginUI</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>VaadinServletMain</servlet-name>
+		<url-pattern>/app/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>VaadinServletLogin</servlet-name>
+		<url-pattern>/login/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>VaadinServletMain</servlet-name>
+		<url-pattern>/VAADIN/*</url-pattern>
+	</servlet-mapping>
+    
+</web-app>
+

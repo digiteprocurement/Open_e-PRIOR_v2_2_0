@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="ec:services:wsdl:Invoice-2"
+	xmlns:inv="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" xmlns:ack="ec:schema:xsd:Ack-2"
+	xmlns:eccac="ec:schema:xsd:CommonAggregateComponents-2" xmlns:fault="urn:oasis:names:specification:ubl:schema:xsd:Fault-1"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="Invoice"
+	targetNamespace="ec:services:wsdl:Invoice-2">
+	<wsdl:types>
+		<xsd:schema targetNamespace="ec:services:wsdl:Invoice-2" elementFormDefault="qualified">
+			<xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2" schemaLocation="../xsd/maindoc/UBL-Invoice-2.0.xsd"/>
+			<xsd:import namespace="ec:schema:xsd:Ack-2" schemaLocation="../xsd/maindoc/EC-Ack-2.0.xsd" />
+			<xsd:import namespace="ec:schema:xsd:CommonAggregateComponents-2" schemaLocation="../xsd/custom/EC-CommonAggregateComponents-2.0.xsd" />
+			<xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:Fault-1" schemaLocation="../xsd/maindoc/EC-Fault-1.0.xsd" />
+			<xsd:element name="SubmitInvoiceRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Invoice" type="inv:InvoiceType"></xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>            
+			<xsd:element name="SubmitInvoiceResponse">
+                <xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Ack" type="ack:AcknowledgmentType" />
+					</xsd:sequence>
+				</xsd:complexType>
+            </xsd:element>
+			<xsd:element name="Header" type="eccac:HeaderType" />
+			<xsd:element name="Fault" type="fault:FaultType" />
+		</xsd:schema>
+	</wsdl:types>
+	<message name="submitInvoiceRequest">
+        <part name="SubmitInvoiceRequest" element="tns:SubmitInvoiceRequest"/>
+		<part name="Header" element="tns:Header" />        
+    </message>
+    <message name="submitInvoiceResponse">
+        <part name="SubmitInvoiceResponse" element="tns:SubmitInvoiceResponse"/>
+        <part name="Header" element="tns:Header" />
+    </message>
+	<message name="FaultResponse">
+		<part name="FaultResponse" element="tns:Fault" />
+	</message>
+	<portType name="invoicePortType">
+        <operation name="submitInvoice">
+            <input message="tns:submitInvoiceRequest"/>
+            <output message="tns:submitInvoiceResponse"/>
+            <fault message="tns:FaultResponse" name="FaultResponse"/>
+        </operation>        
+    </portType>
+    <binding name="invoiceBinding" type="tns:invoicePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="submitInvoice">
+            <soap:operation style="document"/>
+            <input>
+                <soap:body use="literal" parts="SubmitInvoiceRequest"/>
+				<soap:header use="literal"	message="tns:submitInvoiceRequest" part="Header">
+					<soap:headerfault message="tns:FaultResponse" part="FaultResponse" use="literal"/>
+				</soap:header>
+            </input>
+            <output>
+                <soap:body use="literal" parts="SubmitInvoiceResponse"/>
+                <soap:header use="literal"	message="tns:submitInvoiceResponse" part="Header">
+					<soap:headerfault message="tns:FaultResponse" part="FaultResponse" use="literal"/>
+				</soap:header>
+            </output>
+            <fault name="FaultResponse">
+				<soap:fault name="FaultResponse" use="literal"/>
+			</fault>
+        </operation>
+    </binding>
+	<service name="invoiceService">
+        <port name="invoicePort" binding="tns:invoiceBinding">
+            <soap:address location="${eprior.root.location}/services"/>
+        </port>
+    </service>
+</definitions>

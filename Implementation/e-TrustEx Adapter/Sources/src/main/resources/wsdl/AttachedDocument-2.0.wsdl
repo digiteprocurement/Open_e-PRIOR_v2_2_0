@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="AttachedDocument"
+	targetNamespace="ec:services:wsdl:AttachedDocument-2"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="ec:services:wsdl:AttachedDocument-2"
+	xmlns:ack="ec:schema:xsd:Ack-2"
+	xmlns:att="urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2"
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+	xmlns:eccac="ec:schema:xsd:CommonAggregateComponents-2"
+	xmlns:fault="urn:oasis:names:specification:ubl:schema:xsd:Fault-1" 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+	<types>
+		<xsd:schema targetNamespace="ec:services:wsdl:AttachedDocument-2" elementFormDefault="qualified">
+			<xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2" schemaLocation="../xsd/maindoc/UBL-AttachedDocument-2.0.xsd" />
+			<xsd:import namespace="ec:schema:xsd:Ack-2"
+				schemaLocation="../xsd/maindoc/EC-Ack-2.0.xsd" />
+			<xsd:import namespace="ec:schema:xsd:CommonAggregateComponents-2"
+				schemaLocation="../xsd/custom/EC-CommonAggregateComponents-2.0.xsd" />
+			<xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:Fault-1"
+				schemaLocation="../xsd/maindoc/EC-Fault-1.0.xsd" />
+			<xsd:element name="SubmitAttachedDocumentRequest">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="AttachedDocument" type="att:AttachedDocumentType"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="SubmitAttachedDocumentResponse">
+			<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Ack" type="ack:AcknowledgmentType" />
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Header" type="eccac:HeaderType" />
+			<xsd:element name="Fault" type="fault:FaultType"/>
+		</xsd:schema>
+	</types>
+
+	<message name="submitAttachedDocumentRequest">
+		<part name="Header" element="tns:Header" />
+		<part name="SubmitAttachedDocumentRequest" element="tns:SubmitAttachedDocumentRequest" />
+		<part name="file" type="xsd:base64Binary" />
+	</message>
+	<message name="submitAttachedDocumentResponse">
+		<part name="SubmitAttachedDocumentResponse" element="tns:SubmitAttachedDocumentResponse" />
+		<part name="Header" element="tns:Header" />
+	</message>
+	<message name="FaultResponse">
+		<part name="FaultResponse" element="tns:Fault" />
+	</message>
+
+	<portType name="attachedDocumentPortType">
+		<operation name="submitAttachedDocument">
+			<input message="tns:submitAttachedDocumentRequest" />
+			<output message="tns:submitAttachedDocumentResponse" />
+			<fault message="tns:FaultResponse" name="FaultResponse"/>
+		</operation>
+	</portType>
+	<binding name="attachedDocumentBinding" type="tns:attachedDocumentPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="submitAttachedDocument">
+			<soap:operation style="document" />
+			<input>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" parts="SubmitAttachedDocumentRequest" />
+						<soap:header use="literal" message="tns:submitAttachedDocumentRequest" part="Header">
+							<soap:headerfault message="tns:FaultResponse" part="FaultResponse" use="literal"/>
+						</soap:header>
+					</mime:part>
+					<mime:part>
+						<mime:content part="file" type="*/*" />
+					</mime:part>
+				</mime:multipartRelated>
+			</input>
+			<output>
+				<soap:body use="literal" parts="SubmitAttachedDocumentResponse" />
+				<soap:header use="literal" message="tns:submitAttachedDocumentResponse" part="Header">
+					<soap:headerfault message="tns:FaultResponse" part="FaultResponse" use="literal"/>
+				</soap:header>
+			</output>
+			<fault name="FaultResponse">
+				<soap:fault name="FaultResponse" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+	<service name="attachedDocumentService">
+		<port name="attachedDocumentPort" binding="tns:attachedDocumentBinding">
+			<soap:address location="${etrustex.root.location}/services" />
+		</port>
+	</service>
+</definitions>

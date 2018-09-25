@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="ec:services:wsdl:CreditNote-2"
+	xmlns:cn="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2" 
+	xmlns:ack="ec:schema:xsd:Ack-2"
+	xmlns:eccac="ec:schema:xsd:CommonAggregateComponents-2" xmlns:fault="urn:oasis:names:specification:ubl:schema:xsd:Fault-1"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" name="CreditNote"
+	targetNamespace="ec:services:wsdl:CreditNote-2">
+	<wsdl:types>
+		<xsd:schema targetNamespace="ec:services:wsdl:CreditNote-2" elementFormDefault="qualified">
+			<xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2" schemaLocation="../xsd/maindoc/UBL-CreditNote-2.0.xsd"/>
+			<xsd:import namespace="ec:schema:xsd:Ack-2" schemaLocation="../xsd/maindoc/EC-Ack-2.0.xsd" />
+			<xsd:import namespace="ec:schema:xsd:CommonAggregateComponents-2" schemaLocation="../xsd/custom/EC-CommonAggregateComponents-2.0.xsd" />
+			<xsd:import namespace="urn:oasis:names:specification:ubl:schema:xsd:Fault-1" schemaLocation="../xsd/maindoc/EC-Fault-1.0.xsd" />
+			 <xsd:element name="SubmitCreditNoteRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="CreditNote" type="cn:CreditNoteType"></xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>            
+			<xsd:element name="SubmitCreditNoteResponse">
+                <xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Ack" type="ack:AcknowledgmentType" />
+					</xsd:sequence>
+				</xsd:complexType>
+            </xsd:element>
+			<xsd:element name="Header" type="eccac:HeaderType" />
+			<xsd:element name="Fault" type="fault:FaultType" />
+		</xsd:schema>
+	</wsdl:types>
+	 <message name="submitCreditNoteRequest">
+        <part name="SubmitCreditNoteRequest" element="tns:SubmitCreditNoteRequest"/>
+		<part name="Header" element="tns:Header" />        
+    </message>
+     <message name="submitCreditNoteResponse">
+        <part name="SubmitCreditNoteResponse" element="tns:SubmitCreditNoteResponse"/>
+        <part name="Header" element="tns:Header" />
+    </message>
+	<message name="FaultResponse">
+		<part name="FaultResponse" element="tns:Fault" />
+	</message>
+	<portType name="creditNotePortType">
+        <operation name="submitCreditNote">
+            <input message="tns:submitCreditNoteRequest"/>
+            <output message="tns:submitCreditNoteResponse"/>
+            <fault message="tns:FaultResponse" name="FaultResponse"/>
+        </operation>        
+    </portType>
+    <binding name="creditNoteBinding" type="tns:creditNotePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="submitCreditNote">
+            <soap:operation style="document"/>
+            <input>
+                <soap:body use="literal" parts="SubmitCreditNoteRequest"/>
+				<soap:header use="literal" message="tns:submitCreditNoteRequest" part="Header">
+					<soap:headerfault message="tns:FaultResponse" part="FaultResponse" use="literal"/>
+				</soap:header>
+            </input>
+            <output>
+                <soap:body use="literal" parts="SubmitCreditNoteResponse"/>
+                <soap:header use="literal" message="tns:submitCreditNoteResponse" part="Header">
+					<soap:headerfault message="tns:FaultResponse" part="FaultResponse" use="literal"/>
+				</soap:header>
+            </output>
+            <fault name="FaultResponse">
+				<soap:fault name="FaultResponse" use="literal"/>
+			</fault>
+        </operation>
+    </binding>
+	<service name="creditNoteService">
+        <port name="creditNotePort" binding="tns:creditNoteBinding">
+            <soap:address location="${eprior.root.location}/services"/>
+        </port>
+    </service>
+</definitions>
